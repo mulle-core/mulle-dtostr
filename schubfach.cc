@@ -7,8 +7,7 @@
 #include <stdint.h> // uint64_t
 #include <string.h> // memcpy
 
-// Significands of overestimates of powers of 10. Generated with
-// https://gist.github.com/vitaut/0e23cff5aec48ccfcc1933687881238d.
+// Significands of overestimates of powers of 10. Generated with gen-pow10.py.
 const uint64_t pow10_significands[] = {
     0x7fbbd8fe5f5e6e27, 0x497a3a2704eec3df, // -292
     0x4fd5679efb9b04d8, 0x5dec645863153a6c, // -291
