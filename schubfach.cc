@@ -1,6 +1,6 @@
 // Implementation of the Schubfach algorithm:
 // https://drive.google.com/file/d/1IEeATSVnEE6TkrHlCYNY2GjaraBjOT4f.
-// Copyright (c) 2012 - present, Victor Zverovich
+// Copyright (c) 2025 - present, Victor Zverovich
 
 #include <bit>      // std::bit_cast
 #include <limits>   // std::numeric_limits
