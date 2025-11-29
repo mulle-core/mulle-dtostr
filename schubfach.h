@@ -7,6 +7,6 @@ namespace schubfach {
 
 /// Writes the shortest correctly rounded decimal representation of `x` to
 /// `buffer`. `buffer` size should be at least 25.
-void dtoa_schubfach(double x, char* buffer) noexcept;
+void dtoa(double x, char* buffer) noexcept;
 
 }  // namespace schubfach
