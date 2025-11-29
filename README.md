@@ -19,3 +19,11 @@ int main() {
 Average formatting time from [dtoa-benchmark](https://github.com/fmtlib/dtoa-benchmark), smaller is better:
 
 <img width="787" height="353" alt="image" src="https://github.com/user-attachments/assets/68c36484-2a1c-478c-89e4-8055880594cf" />
+
+The binary size is ~13kiB on an ARM-based macOS:
+
+```
+% c++ -c -Os -DNDEBUG -std=c++20 schubfach.cc
+% du -Ah schubfach.o
+ 13K	schubfach.o
+```
