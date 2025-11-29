@@ -750,7 +750,7 @@ void write(char* buffer, uint64_t dec_sig, int dec_exp) noexcept {
   *buffer = '\0';
 }
 
-void schubfach::dtoa(char* buffer, double x) noexcept {
+void schubfach::dtoa(double x, char* buffer) noexcept {
   uint64_t bits = std::bit_cast<uint64_t>(x);
   if ((bits >> 63) != 0) *buffer++ = '-';
 
