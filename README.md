@@ -27,3 +27,12 @@ The binary size is ~13kiB on an ARM-based macOS:
 % du -Ah schubfach.o
  13K	schubfach.o
 ```
+
+Build time is ~40ms by default and ~50ms with optimizations enabled:
+
+```
+% time c++ -c -std=c++20 schubfach.cc
+c++ -c -std=c++20 schubfach.cc  0.04s user 0.04s system 88% cpu 0.087 total
+% time c++ -c -std=c++20 schubfach.cc -O2
+c++ -c -std=c++20 schubfach.cc -O2  0.05s user 0.20s system 63% cpu 0.389 total
+```
