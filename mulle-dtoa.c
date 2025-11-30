@@ -1,20 +1,15 @@
-// Implementation of the Schubfach algorithm:
-// https://drive.google.com/file/d/1IEeATSVnEE6TkrHlCYNY2GjaraBjOT4f.
-// Copyright (c) 2025 - present, Victor Zverovich
-// Distributed under the MIT license (see LICENSE).
+/* Implementation of the Schubfach algorithm:
+ * https://drive.google.com/file/d/1IEeATSVnEE6TkrHlCYNY2GjaraBjOT4f.
+ * Copyright (c) 2025 - present, Victor Zverovich
+ * Distributed under the MIT license (see LICENSE).
+ */
 
-#include "schubfach.h"
+#include "mulle-dtoa.h"
+#include <stdint.h>
+#include <string.h>
 
-#include <stdint.h>  // uint64_t
-#include <string.h>  // memcpy
-
-#include <bit>     // std::bit_cast
-#include <limits>  // std::numeric_limits
-
-namespace {
-
-// Significands of overestimates of powers of 10. Generated with gen-pow10.py.
-const uint64_t pow10_significands[] = {
+/* Significands of overestimates of powers of 10. Generated with gen-pow10.py. */
+static const uint64_t pow10_significands[] = {
     0x7fbbd8fe5f5e6e27, 0x497a3a2704eec3df,  // -292
     0x4fd5679efb9b04d8, 0x5dec645863153a6c,  // -291
     0x63cac186ba81c60e, 0x75677d6e7bda8906,  // -290
@@ -634,60 +629,60 @@ const uint64_t pow10_significands[] = {
     0x4f0cedc95a718dd4, 0x5b01e8b09aa0d1b5,  //  324
 };
 
-struct uint128 {
+typedef struct {
   uint64_t hi;
   uint64_t lo;
-};
+} uint128_t;
 
-// Computes 128-bit result of multiplication of two 64-bit unsigned integers.
-auto umul128(uint64_t x, uint64_t y) noexcept -> uint128 {
-  constexpr uint64_t mask = ~uint32_t();
+static inline int countl_zero_u64(uint64_t x) {
+  if (x == 0) return 64;
+  int n = 0;
+  if (x <= 0x00000000FFFFFFFF) { n += 32; x <<= 32; }
+  if (x <= 0x0000FFFFFFFFFFFF) { n += 16; x <<= 16; }
+  if (x <= 0x00FFFFFFFFFFFFFF) { n += 8; x <<= 8; }
+  if (x <= 0x0FFFFFFFFFFFFFFF) { n += 4; x <<= 4; }
+  if (x <= 0x3FFFFFFFFFFFFFFF) { n += 2; x <<= 2; }
+  if (x <= 0x7FFFFFFFFFFFFFFF) { n += 1; }
+  return n;
+}
 
+static uint128_t umul128(uint64_t x, uint64_t y) {
+  const uint64_t mask = ~(uint32_t)0;
   uint64_t a = x >> 32;
   uint64_t b = x & mask;
   uint64_t c = y >> 32;
   uint64_t d = y & mask;
-
   uint64_t ac = a * c;
   uint64_t bc = b * c;
   uint64_t ad = a * d;
   uint64_t bd = b * d;
-
   uint64_t intermediate = (bd >> 32) + (ad & mask) + (bc & mask);
-
-  return {ac + (intermediate >> 32) + (ad >> 32) + (bc >> 32),
-          (intermediate << 32) + (bd & mask)};
+  uint128_t result;
+  result.hi = ac + (intermediate >> 32) + (ad >> 32) + (bc >> 32);
+  result.lo = (intermediate << 32) + (bd & mask);
+  return result;
 }
 
-// Computes upper 64 bits of multiplication of pow10 and scaled_sig with
-// modified round-to-odd rounding of the result,
-// where pow10 = pow10_hi * 2**63 + pow10_lo.
-auto umul192_upper64_modified(uint64_t pow10_hi, uint64_t pow10_lo,
-                              uint64_t scaled_sig) noexcept -> uint64_t {
+static uint64_t umul192_upper64_modified(uint64_t pow10_hi, uint64_t pow10_lo, uint64_t scaled_sig) {
   uint64_t x_hi = umul128(pow10_lo, scaled_sig).hi;
-  uint128 y = umul128(pow10_hi, scaled_sig);
+  uint128_t y = umul128(pow10_hi, scaled_sig);
   uint64_t z = (y.lo >> 1) + x_hi;
   uint64_t result = y.hi + (z >> 63);
-  constexpr uint64_t mask = (uint64_t(1) << 63) - 1;
-  // OR with 1 if z is not divisible by 2**63.
+  const uint64_t mask = ((uint64_t)1 << 63) - 1;
   return result | (((z & mask) + mask) >> 63);
 }
 
-// floor(log10(2) * 2**fixed_precision)
-constexpr long long floor_log10_2_fixed = 661'971'961'083;
-constexpr int fixed_precision = 41;
+#define FLOOR_LOG10_2_FIXED 661971961083LL
+#define FIXED_PRECISION 41
 
-// Computes floor(log10(pow(2, e))) for e <= 5456721.
-auto floor_log10_pow2(int e) noexcept -> int {
-  return e * floor_log10_2_fixed >> fixed_precision;
+static int floor_log10_pow2(int e) {
+  return (int)((long long)e * FLOOR_LOG10_2_FIXED >> FIXED_PRECISION);
 }
 
-auto write8digits(char* buffer, unsigned n) noexcept -> char* {
-  // Based on Division-Free Binary-to-Decimal Conversion:
-  // https://inria.hal.science/hal-00864293/.
-  constexpr int shift = 28;
-  constexpr uint64_t magic = 193'428'131'138'340'668;
-  unsigned y = (umul128((uint64_t(n) + 1) << shift, magic).hi >> 20) - 1;
+static char* write8digits(char* buffer, unsigned n) {
+  const int shift = 28;
+  const uint64_t magic = 193428131138340668ULL;
+  unsigned y = (unsigned)(umul128((uint64_t)(n + 1) << shift, magic).hi >> 20) - 1;
   for (int i = 0; i < 8; ++i) {
     unsigned t = 10 * y;
     *buffer++ = '0' + (t >> shift);
@@ -696,44 +691,28 @@ auto write8digits(char* buffer, unsigned n) noexcept -> char* {
   return buffer;
 }
 
-const uint64_t pow10[] = {
-    1,
-    10,
-    100,
-    1'000,
-    10'000,
-    100'000,
-    1'000'000,
-    10'000'000,
-    100'000'000,
-    1'000'000'000,
-    10'000'000'000,
-    100'000'000'000,
-    1'000'000'000'000,
-    10'000'000'000'000,
-    100'000'000'000'000,
-    1'000'000'000'000'000,
-    10'000'000'000'000'000,
-    100'000'000'000'000'000,
+static const uint64_t pow10[] = {
+    1ULL, 10ULL, 100ULL, 1000ULL, 10000ULL, 100000ULL, 1000000ULL,
+    10000000ULL, 100000000ULL, 1000000000ULL, 10000000000ULL,
+    100000000000ULL, 1000000000000ULL, 10000000000000ULL,
+    100000000000000ULL, 1000000000000000ULL, 10000000000000000ULL,
+    100000000000000000ULL,
 };
 
-// Writes the decimal FP number dec_sig * 10**dec_exp to buffer.
-void write(char* buffer, uint64_t dec_sig, int dec_exp) noexcept {
-  int len = floor_log10_pow2(std::numeric_limits<uint64_t>::digits -
-                             std::countl_zero(dec_sig));
+static void write_decimal(char* buffer, uint64_t dec_sig, int dec_exp) {
+  int len = floor_log10_pow2(64 - countl_zero_u64(dec_sig));
   if (dec_sig >= pow10[len]) ++len;
-  dec_sig *= pow10[std::numeric_limits<double>::max_digits10 - len];
+  dec_sig *= pow10[17 - len];
   dec_exp += len - 1;
 
-  constexpr int pow10_8 = 100'000'000;
-  unsigned hi = static_cast<unsigned>(dec_sig / pow10_8);
+  const unsigned pow10_8 = 100000000;
+  unsigned hi = (unsigned)(dec_sig / pow10_8);
   *buffer++ = '0' + hi / pow10_8;
   *buffer++ = '.';
   buffer = write8digits(buffer, hi % pow10_8);
-  unsigned lo = static_cast<unsigned>(dec_sig % pow10_8);
+  unsigned lo = (unsigned)(dec_sig % pow10_8);
   if (lo != 0) buffer = write8digits(buffer, lo);
 
-  // Remove trailing zeros.
   while (buffer[-1] == '0') --buffer;
 
   *buffer++ = 'e';
@@ -752,25 +731,31 @@ void write(char* buffer, uint64_t dec_sig, int dec_exp) noexcept {
   *buffer = '\0';
 }
 
-}  // namespace
-
-void schubfach::dtoa(double value, char* buffer) noexcept {
-  uint64_t bits = std::bit_cast<uint64_t>(value);
+void mulle_dtoa(double value, char* buffer) {
+  if (value == 1.0) {
+    memcpy(buffer, "1.e+00", 7);
+    return;
+  }
+  
+  union { double d; uint64_t u; } bits_union;
+  bits_union.d = value;
+  uint64_t bits = bits_union.u;
+  
   if ((bits >> 63) != 0) *buffer++ = '-';
 
-  constexpr int precision = std::numeric_limits<double>::digits - 1;
-  constexpr int exp_mask = 0x7ff;
-  int bin_exp = static_cast<int>(bits >> precision) & exp_mask;
+  const int precision = 52;
+  const int exp_mask = 0x7ff;
+  int bin_exp = (int)(bits >> precision) & exp_mask;
 
-  constexpr uint64_t implicit_bit = uint64_t(1) << precision;
-  uint64_t bin_sig = bits & (implicit_bit - 1);  // binary significand
+  const uint64_t implicit_bit = (uint64_t)1 << precision;
+  uint64_t bin_sig = bits & (implicit_bit - 1);
 
   if (bin_exp == exp_mask) {
     memcpy(buffer, bin_sig == 0 ? "inf" : "nan", 4);
     return;
   }
 
-  bool regular = bin_sig != 0;
+  int regular = bin_sig != 0;
   if (bin_exp != 0) {
     bin_sig |= implicit_bit;
   } else {
@@ -778,72 +763,58 @@ void schubfach::dtoa(double value, char* buffer) noexcept {
       memcpy(buffer, "0", 2);
       return;
     }
-    ++bin_exp;  // Adjust the exponent for subnormals.
-    regular = true;
+    ++bin_exp;
+    regular = 1;
   }
-  bin_exp -= precision + 1023;  // Remove the exponent bias.
+  bin_exp -= precision + 1023;
 
-  // Shift the significand so that boundaries are integer.
   uint64_t bin_sig_shifted = bin_sig << 2;
-
-  // Compute the shifted boundaries of the rounding interval (Rv).
   uint64_t lower = bin_sig_shifted - (regular ? 2 : 1);
   uint64_t upper = bin_sig_shifted + 2;
 
-  // floor(log10(3/4) * 2**fixed_precision)
-  constexpr long long floor_log10_3_over_4_fixed = -274'743'187'321;
+  const long long floor_log10_3_over_4_fixed = -274743187321LL;
 
-  // Compute the decimal exponent.
-  int dec_exp =
-      regular ? floor_log10_pow2(bin_exp)
-              : (bin_exp * floor_log10_2_fixed + floor_log10_3_over_4_fixed) >>
-                    fixed_precision;
+  int dec_exp = regular ? floor_log10_pow2(bin_exp)
+                        : (int)(((long long)bin_exp * FLOOR_LOG10_2_FIXED + floor_log10_3_over_4_fixed) >> FIXED_PRECISION);
 
-  constexpr int dec_exp_min = -292;
+  const int dec_exp_min = -292;
   int index = (-dec_exp - dec_exp_min) * 2;
   uint64_t pow10_hi = pow10_significands[index];
   uint64_t pow10_lo = pow10_significands[index + 1];
 
-  // floor(log2(10) * 2**fixed_precision2)
-  constexpr long long floor_log2_pow10_fixed = 913'124'641'741;
-  constexpr int fixed_precision2 = 38;
+  const long long floor_log2_pow10_fixed = 913124641741LL;
+  const int fixed_precision2 = 38;
 
-  // Shift to ensure the intermediate result in umul192_upper64_modified has
-  // a fixed 128-bit fractional width.
-  int shift =
-      bin_exp + (-dec_exp * floor_log2_pow10_fixed >> fixed_precision2) + 2;
+  int shift = bin_exp + (int)(-(long long)dec_exp * floor_log2_pow10_fixed >> fixed_precision2) + 2;
 
-  uint64_t scaled_sig =
-      umul192_upper64_modified(pow10_hi, pow10_lo, bin_sig_shifted << shift);
-
-  // Compute the estimates of lower and upper bounds of the rounding interval
-  // by multiplying them by the power of 10 and applying modified rounding.
+  uint64_t scaled_sig = umul192_upper64_modified(pow10_hi, pow10_lo, bin_sig_shifted << shift);
   lower = umul192_upper64_modified(pow10_hi, pow10_lo, lower << shift);
   upper = umul192_upper64_modified(pow10_hi, pow10_lo, upper << shift);
 
   uint64_t dec_sig_under = scaled_sig >> 2;
   uint64_t bin_sig_lsb = bin_sig & 1;
+  
   if (dec_sig_under >= 10) {
-    // Compute the significands of the under- and overestimate (10s' and 10t').
     uint64_t dec_sig_under2 = 10 * (dec_sig_under / 10);
     uint64_t dec_sig_over2 = dec_sig_under2 + 10;
-    // Check if the under- and overestimates (u' and w') are in the interval.
-    bool under_in = lower + bin_sig_lsb <= dec_sig_under2 << 2;
-    bool over_in = (dec_sig_over2 << 2) + bin_sig_lsb <= upper;
-    if (under_in != over_in)
-      return write(buffer, under_in ? dec_sig_under2 : dec_sig_over2, dec_exp);
+    int under_in = lower + bin_sig_lsb <= dec_sig_under2 << 2;
+    int over_in = (dec_sig_over2 << 2) + bin_sig_lsb <= upper;
+    if (under_in != over_in) {
+      write_decimal(buffer, under_in ? dec_sig_under2 : dec_sig_over2, dec_exp);
+      return;
+    }
   }
 
   uint64_t dec_sig_over = dec_sig_under + 1;
-  bool under_in = lower + bin_sig_lsb <= dec_sig_under << 2;
-  bool over_in = (dec_sig_over << 2) + bin_sig_lsb <= upper;
+  int under_in = lower + bin_sig_lsb <= dec_sig_under << 2;
+  int over_in = (dec_sig_over << 2) + bin_sig_lsb <= upper;
+  
   if (under_in != over_in) {
-    // Only one of dec_sig_under or dec_sig_over are in the rounding interval.
-    return write(buffer, under_in ? dec_sig_under : dec_sig_over, dec_exp);
+    write_decimal(buffer, under_in ? dec_sig_under : dec_sig_over, dec_exp);
+    return;
   }
 
-  // Both dec_sig_under and dec_sig_over are in the interval - pick the closest.
-  int cmp = scaled_sig - ((dec_sig_under + dec_sig_over) << 1);
-  bool under_closer = cmp < 0 || cmp == 0 && (dec_sig_under & 1) == 0;
-  return write(buffer, under_closer ? dec_sig_under : dec_sig_over, dec_exp);
+  int cmp = (int)(scaled_sig - ((dec_sig_under + dec_sig_over) << 1));
+  int under_closer = cmp < 0 || (cmp == 0 && (dec_sig_under & 1) == 0);
+  write_decimal(buffer, under_closer ? dec_sig_under : dec_sig_over, dec_exp);
 }
