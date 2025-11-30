@@ -758,7 +758,7 @@ void schubfach::dtoa(double x, char* buffer) noexcept {
   uint64_t bits = std::bit_cast<uint64_t>(x);
   if ((bits >> 63) != 0) *buffer++ = '-';
 
-  constexpr int precision = 52;
+  constexpr int precision = std::numeric_limits<double>::digits - 1;
   constexpr int exp_mask = 0x7ff;
   int bin_exp = static_cast<int>(bits >> precision) & exp_mask;
 
