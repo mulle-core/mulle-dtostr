@@ -818,3 +818,102 @@ void mulle_dtoa(double value, char* buffer) {
   int under_closer = cmp < 0 || (cmp == 0 && (dec_sig_under & 1) == 0);
   write_decimal(buffer, under_closer ? dec_sig_under : dec_sig_over, dec_exp);
 }
+
+struct mulle_dtoa_decimal mulle_dtoa_decompose(double value) {
+  struct mulle_dtoa_decimal result;
+  
+  union { double d; uint64_t u; } bits_union;
+  bits_union.d = value;
+  uint64_t bits = bits_union.u;
+  
+  result.sign = (bits >> 63) != 0;
+
+  const int precision = 52;
+  const int exp_mask = 0x7ff;
+  int bin_exp = (int)(bits >> precision) & exp_mask;
+
+  const uint64_t implicit_bit = (uint64_t)1 << precision;
+  uint64_t bin_sig = bits & (implicit_bit - 1);
+
+  if (bin_exp == exp_mask) {
+    result.special = bin_sig == 0 ? 1 : 2;  /* 1=inf, 2=nan */
+    result.significand = 0;
+    result.exponent = 0;
+    return result;
+  }
+
+  int regular = bin_sig != 0;
+  if (bin_exp != 0) {
+    bin_sig |= implicit_bit;
+  } else {
+    if (bin_sig == 0) {
+      result.special = 3;  /* zero */
+      result.significand = 0;
+      result.exponent = 0;
+      return result;
+    }
+    ++bin_exp;
+    regular = 1;
+  }
+  
+  result.special = 0;  /* normal */
+  bin_exp -= precision + 1023;
+
+  uint64_t bin_sig_shifted = bin_sig << 2;
+  uint64_t lower = bin_sig_shifted - (regular ? 2 : 1);
+  uint64_t upper = bin_sig_shifted + 2;
+
+  const long long floor_log10_3_over_4_fixed = -274743187321LL;
+
+  int dec_exp = regular ? floor_log10_pow2(bin_exp)
+                        : (int)(((long long)bin_exp * FLOOR_LOG10_2_FIXED + floor_log10_3_over_4_fixed) >> FIXED_PRECISION);
+
+  const int dec_exp_min = -292;
+  int index = (-dec_exp - dec_exp_min) * 2;
+  uint64_t pow10_hi = pow10_significands[index];
+  uint64_t pow10_lo = pow10_significands[index + 1];
+
+  const long long floor_log2_pow10_fixed = 913124641741LL;
+  const int fixed_precision2 = 38;
+
+  int shift = bin_exp + (int)(-(long long)dec_exp * floor_log2_pow10_fixed >> fixed_precision2) + 2;
+
+  uint64_t scaled_sig = umul192_upper64_modified(pow10_hi, pow10_lo, bin_sig_shifted << shift);
+  lower = umul192_upper64_modified(pow10_hi, pow10_lo, lower << shift);
+  upper = umul192_upper64_modified(pow10_hi, pow10_lo, upper << shift);
+
+  uint64_t dec_sig_under = scaled_sig >> 2;
+  uint64_t bin_sig_lsb = bin_sig & 1;
+  uint64_t dec_sig;
+  
+  if (dec_sig_under >= 10) {
+    uint64_t dec_sig_under2 = 10 * (dec_sig_under / 10);
+    uint64_t dec_sig_over2 = dec_sig_under2 + 10;
+    int under_in = lower + bin_sig_lsb <= dec_sig_under2 << 2;
+    int over_in = (dec_sig_over2 << 2) + bin_sig_lsb <= upper;
+    if (under_in != over_in) {
+      dec_sig = under_in ? dec_sig_under2 : dec_sig_over2;
+      result.significand = dec_sig;
+      result.exponent = dec_exp;
+      return result;
+    }
+  }
+
+  uint64_t dec_sig_over = dec_sig_under + 1;
+  int under_in = lower + bin_sig_lsb <= dec_sig_under << 2;
+  int over_in = (dec_sig_over << 2) + bin_sig_lsb <= upper;
+  
+  if (under_in != over_in) {
+    dec_sig = under_in ? dec_sig_under : dec_sig_over;
+    result.significand = dec_sig;
+    result.exponent = dec_exp;
+    return result;
+  }
+
+  int cmp = (int)(scaled_sig - ((dec_sig_under + dec_sig_over) << 1));
+  int under_closer = cmp < 0 || (cmp == 0 && (dec_sig_under & 1) == 0);
+  dec_sig = under_closer ? dec_sig_under : dec_sig_over;
+  result.significand = dec_sig;
+  result.exponent = dec_exp;
+  return result;
+}
