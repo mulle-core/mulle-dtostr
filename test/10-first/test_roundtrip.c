@@ -1,4 +1,4 @@
-#include <mulle-dtoa/mulle-dtoa.h>
+#include <mulle-dtostr/mulle-dtostr.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -7,8 +7,8 @@
 #include <stdint.h>
 
 void test_roundtrip(double value, const char* name) {
-    char buffer[MULLE__DTOA_BUFFER_SIZE];
-    mulle_dtoa(value, buffer);
+    char buffer[MULLE__DTOSTR_BUFFER_SIZE];
+    mulle_dtostr(value, buffer);
     
     double parsed = strtod(buffer, NULL);
     
@@ -41,7 +41,7 @@ void test_roundtrip(double value, const char* name) {
 }
 
 int main() {
-    printf("Round-trip test: mulle_dtoa -> strtod\n");
+    printf("Round-trip test: mulle_dtostr -> strtod\n");
     printf("=====================================\n\n");
     
     /* Test various values */

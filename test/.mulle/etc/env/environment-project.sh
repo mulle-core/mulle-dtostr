@@ -8,13 +8,13 @@ export PROJECT_TYPE="none"
 #
 #
 #
-export PROJECT_NAME="mulle-dtoa-test"
+export PROJECT_NAME="mulle-dtostr"
 
 
 #
 #
 #
-export TEST_PROJECT_NAME="mulle-dtoa"
+export TEST_PROJECT_NAME="mulle-dtostr"
 
 
 #

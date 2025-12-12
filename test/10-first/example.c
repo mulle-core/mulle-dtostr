@@ -1,9 +1,9 @@
-#include <mulle-dtoa/mulle-dtoa.h>
+#include <mulle-dtostr/mulle-dtostr.h>
 #include <stdio.h>
 
 int main(void) {
-  char buf[MULLE__DTOA_BUFFER_SIZE];
-  mulle_dtoa(6.62607015e-34, buf);
+  char buf[MULLE__DTOSTR_BUFFER_SIZE];
+  mulle_dtostr(6.62607015e-34, buf);
   puts(buf);
   return 0;
 }

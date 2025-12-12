@@ -6,3 +6,4 @@ mulle-c/c-cmake;buildtool
 mulle-sde/c-cmake;buildtool
 mulle-sde/cmake;buildtool
 mulle-c/c-demo;extra
+mulle-sde/sublime-text;extra
