@@ -1,7 +1,8 @@
 # mulle-dtoa
 
 A C implementation of the Schubfach algorithm - fast and accurate conversion
-of IEEE-754 `double` values to decimal strings.
+of IEEE-754 `double` values to decimal strings. A fork of
+[vitaut/schubfach](https://github.com/vitaut/schubfach)
 
 Usage:
 
