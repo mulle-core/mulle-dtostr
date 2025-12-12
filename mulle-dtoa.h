@@ -11,6 +11,7 @@
 #define MULLE__DTOA_VERSION   ((0 << 24) | (1 << 8) | 0)
 
 #include <stdint.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,10 +38,11 @@ struct mulle_dtoa_decimal   mulle_dtoa_decompose( double value);
 /*
  * Writes the shortest correctly rounded decimal representation of `value` to
  * `buffer`. `buffer` should point to a buffer of size MULLE__DTOA_BUFFER_SIZE
- * or larger. It is claimed that you get the exact same double value back
+ * or larger. Returns the length of the generated string (excluding null terminator).
+ * It is claimed that you get the exact same double value back
  * when using strtod (at least on linux, else we'd need to implement our own.)
  */
-void   mulle_dtoa( double value, char *buffer);
+size_t   mulle_dtoa( double value, char *buffer);
 
 #ifdef __cplusplus
 }

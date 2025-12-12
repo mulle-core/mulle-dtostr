@@ -68,12 +68,12 @@ static const struct uint128 pow10_significands[] = {
 };
 
 /* Forward declarations */
-static void write_mulle(char* buffer, uint64_t dec_sig, int dec_exp);
+static size_t write_mulle(char* buffer, uint64_t dec_sig, int dec_exp);
 static char* write_significand(char* buffer, uint64_t value);
 static void write2digits(char* buffer, uint32_t value);
 static struct div_mod_result divmod100_3(uint32_t n);
 
-void mulle_dtoa(double value, char* buffer) {
+size_t mulle_dtoa(double value, char* buffer) {
   uint64_t bits = 0;
   memcpy(&bits, &value, sizeof(value));
   *buffer = '-';
@@ -82,11 +82,11 @@ void mulle_dtoa(double value, char* buffer) {
   /* Early escape for 1.0 optimization */
   if (value == 1.0) {
     strcpy(buffer, "1");
-    return;
+    return 1;
   }
   if (value == -1.0) {
     strcpy(buffer - 1, "-1");
-    return;
+    return 2;
   }
 
   const int num_sig_bits = 52; /* std::numeric_limits<double>::digits - 1 */
@@ -100,11 +100,11 @@ void mulle_dtoa(double value, char* buffer) {
   if (((bin_exp + 1) & exp_mask) <= 1) {
     if (bin_exp != 0) {
       memcpy(buffer, bin_sig == 0 ? "inf" : "nan", 4);
-      return;
+      return bin_sig == 0 ? 3 : 3;
     }
     if (bin_sig == 0) {
       memcpy(buffer, "0", 2);
-      return;
+      return 1;
     }
     /* Handle subnormals */
     bin_sig ^= implicit_bit;
@@ -118,8 +118,7 @@ void mulle_dtoa(double value, char* buffer) {
   if ((bin_exp < 0) && (bin_exp >= -num_sig_bits)) {
     uint64_t f = bin_sig >> -bin_exp;
     if (f << -bin_exp == bin_sig) {
-      write_mulle(buffer, f, 0);
-      return;
+      return write_mulle(buffer, f, 0);
     }
   }
 
@@ -158,8 +157,7 @@ void mulle_dtoa(double value, char* buffer) {
   /* Single shorter candidate optimization */
   uint64_t shorter = 10 * ((upper >> 2) / 10);
   if ((shorter << 2) >= lower) {
-    write_mulle(buffer, shorter, dec_exp);
-    return;
+    return write_mulle(buffer, shorter, dec_exp);
   }
 
   uint64_t scaled_sig = umul192_upper64_modified(pow10_hi, pow10_lo, bin_sig_shifted << shift);
@@ -170,7 +168,7 @@ void mulle_dtoa(double value, char* buffer) {
   int64_t cmp = (int64_t)(scaled_sig - ((dec_sig_under + dec_sig_over) << 1));
   int under_closer = cmp < 0 || (cmp == 0 && (dec_sig_under & 1) == 0);
   int under_in = (dec_sig_under << 2) >= lower;
-  write_mulle(buffer, (under_closer && under_in) ? dec_sig_under : dec_sig_over, dec_exp);
+  return write_mulle(buffer, (under_closer && under_in) ? dec_sig_under : dec_sig_over, dec_exp);
 }
 
 /* Helper functions converted from zmij C++ */
@@ -294,7 +292,7 @@ static int uint64_to_string(uint64_t value, char* buffer) {
   return len;
 }
 
-static void write_mulle(char* buffer, uint64_t dec_sig, int dec_exp) {
+static size_t write_mulle(char* buffer, uint64_t dec_sig, int dec_exp) {
   /* Normalize to shortest representation */
   int trailing_zeros = 0;
   while (dec_sig % 10 == 0 && dec_sig > 0) {
@@ -374,6 +372,9 @@ static void write_mulle(char* buffer, uint64_t dec_sig, int dec_exp) {
       }
     }
   }
+  
+  /* Return the length of the generated string */
+  return strlen(buffer);
 }
 
 struct mulle_dtoa_decimal mulle_dtoa_decompose(double value) {
