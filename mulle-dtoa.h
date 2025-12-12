@@ -1,7 +1,7 @@
 /* Implementation of the Schubfach algorithm:
- * https://drive.google.com/file/d/1IEeATSVnEE6TkrHlCYNY2GjaraBjOT4f.
+ * https://github.com/vitaut/zmij
  * Copyright (c) 2025 - present, Victor Zverovich
- * Copyright (c) 2025 - C conversion by Nat!
+ * Copyright (c) 2025 - C conversion and additional code by Nat!
  * Distributed under the MIT license (see LICENSE).
  */
 
@@ -32,12 +32,15 @@ struct mulle_dtoa_decimal {
 /* Decomposes a double into decimal representation.
  * Returns the intermediate form suitable for custom formatting.
  */
-struct mulle_dtoa_decimal mulle_dtoa_decompose(double value);
+struct mulle_dtoa_decimal   mulle_dtoa_decompose( double value);
 
-/* Writes the shortest correctly rounded decimal representation of `value` to
- * `buffer`. `buffer` should point to a buffer of size MULLE__DTOA_BUFFER_SIZE or larger.
+/*
+ * Writes the shortest correctly rounded decimal representation of `value` to
+ * `buffer`. `buffer` should point to a buffer of size MULLE__DTOA_BUFFER_SIZE
+ * or larger. It is claimed that you get the exact same double value back
+ * when using strtod (at least on linux, else we'd need to implement our own.)
  */
-void mulle_dtoa(double value, char* buffer);
+void   mulle_dtoa( double value, char *buffer);
 
 #ifdef __cplusplus
 }

@@ -2,3 +2,4 @@ test_compare
 *.o
 example_mulle
 test_decompose
+research/
