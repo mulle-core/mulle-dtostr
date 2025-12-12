@@ -1,19 +1,19 @@
-#include <mulle-dtoa/mulle-dtoa.h>
+#include <mulle-dtostr/mulle-dtostr.h>
 #include <stdio.h>
 #include <math.h>
 
 void test_value(double value, const char* label) {
-  char buf[MULLE__DTOA_BUFFER_SIZE];
+  char buf[MULLE__DTOSTR_BUFFER_SIZE];
   char sys_buf[100];
   
-  mulle_dtoa(value, buf);
+  mulle_dtostr(value, buf);
   snprintf(sys_buf, sizeof(sys_buf), "%.17g", value);
   
   printf("%-20s mulle: %-20s system: %s\n", label, buf, sys_buf);
 }
 
 int main(void) {
-  printf("Comparison: mulle_dtoa vs system printf\n");
+  printf("Comparison: mulle_dtostr vs system printf\n");
   printf("===========================================\n\n");
   
   test_value(INFINITY, "+INFINITY");

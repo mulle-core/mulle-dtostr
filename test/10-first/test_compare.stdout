@@ -1,4 +1,4 @@
-Comparison: mulle_dtoa vs system printf
+Comparison: mulle_dtostr vs system printf
 ===========================================
 
 +INFINITY            mulle: inf                  system: inf

@@ -2,7 +2,7 @@
 
 Use `mulle-sde test` to run the tests. Each test is
 specified by a file with file extension `.c`. This file
-is compiled and linked with **mulle-dtoa-test**.
+is compiled and linked with **mulle-dtostr**.
 
 * run specific test with `mulle-sde test run <testfile>`
 * rerun only failed tests with `mulle-sde test rerun`

@@ -1,1 +1,1 @@
-mulle-dtoa;${MULLE__DTOA_NODETYPE:-tar};;8A628BFE-94E8-4450-90FC-E44E4D5FC327;${MULLE__DTOA_URL:-https://github.com/nat/mulle-dtoa/archive/${MULLE_TAG}.tar.gz};${MULLE__DTOA_BRANCH};${MULLE__DTOA_TAG:-latest};;
+mulle-dtostr;${MULLE__DTOSTR_NODETYPE:-tar};;6AB63BB1-8E1A-411B-BC24-4E3122799700;${MULLE__DTOSTR_URL:-https://github.com/nat/mulle-dtostr/archive/${MULLE_TAG}.tar.gz};${MULLE__DTOSTR_BRANCH};${MULLE__DTOSTR_TAG:-latest};;

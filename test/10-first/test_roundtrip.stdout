@@ -1,4 +1,4 @@
-Round-trip test: mulle_dtoa -> strtod
+Round-trip test: mulle_dtostr -> strtod
 =====================================
 
 0.0                 : 0 ✓ (both zero, same sign)

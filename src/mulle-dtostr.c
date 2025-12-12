@@ -4,10 +4,10 @@
  * Distributed under the MIT license (see LICENSE).
  * 
  * This implementation ports the zmij algorithm (an optimized Schubfach variant)
- * from C++ to C while maintaining the original mulle-dtoa API.
+ * from C++ to C while maintaining the original mulle-dtostr API.
  */
 
-#include "mulle-dtoa.h"
+#include "mulle-dtostr.h"
 
 #include <assert.h>
 #include <stdint.h>
@@ -222,8 +222,8 @@ static size_t write_mulle(char* buffer, uint64_t dec_sig, int dec_exp) {
   return( 6);
 }
 
-struct mulle_dtoa_decimal mulle_dtoa_decompose(double value) {
-    struct mulle_dtoa_decimal result = {0};
+struct mulle_dtostr_decimal mulle_dtostr_decompose(double value) {
+    struct mulle_dtostr_decimal result = {0};
     
     uint64_t bits = 0;
     memcpy(&bits, &value, sizeof(value));
@@ -309,12 +309,12 @@ struct mulle_dtoa_decimal mulle_dtoa_decompose(double value) {
     return result;
 }
 
-size_t mulle_dtoa(double value, char* buffer) {
-  struct mulle_dtoa_decimal dec;
+size_t mulle_dtostr(double value, char* buffer) {
+  struct mulle_dtostr_decimal dec;
   char                      *start;
   size_t                    len;
   
-  dec   = mulle_dtoa_decompose( value);
+  dec   = mulle_dtostr_decompose( value);
   start = buffer;
   
   /* Handle sign */

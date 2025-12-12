@@ -1,4 +1,4 @@
-Testing mulle_dtoa_decompose
+Testing mulle_dtostr_decompose
 ============================
 
 0.0                  sign=0 special=3 sig=0 exp=0
