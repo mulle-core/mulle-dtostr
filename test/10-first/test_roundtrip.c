@@ -54,6 +54,13 @@ int main() {
     test_roundtrip(12.2, "12.2");
     test_roundtrip(0.1, "0.1");
     test_roundtrip(0.01, "0.01");
+    test_roundtrip(8.199999999999998, "8.199999999999998");
+    test_roundtrip(8.199999999999999, "8.199999999999999");
+//    test_roundtrip(8.1999999999999998, "8.1999999999999998");
+//    test_roundtrip(8.1999999999999999, "8.1999999999999999");
+    test_roundtrip(8.2, "8.2");
+//    test_roundtrip(8.2000000000000001, "8.2000000000000001");
+    test_roundtrip(8.200000000000001, "8.200000000000001");
     test_roundtrip(3.141592653589793, "pi");
     test_roundtrip(2.718281828459045, "e");
     test_roundtrip(6.62607015e-34, "Planck constant");
