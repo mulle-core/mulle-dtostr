@@ -1,0 +1,16 @@
+{
+   "name" : "mulle-dtostr",
+   "version" : "0.1.0",
+   "description" : "Double to string conversion",
+   "keywords" : [],
+   "license" : "UNLICENSED",
+   "repo" : "mulle-core/mulle-strtod",
+   "src" : [
+      "src/mulle-dtostr.c",
+      "src/mulle-dtostr.h",
+      "src/pow10_table_data.inc"
+   ],
+   "dependencies" : {
+      "mulle-c/mulle-c11": "*"
+   }
+}
