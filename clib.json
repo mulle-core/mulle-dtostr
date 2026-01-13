@@ -4,7 +4,7 @@
    "description" : "Double to string conversion",
    "keywords" : [],
    "license" : "UNLICENSED",
-   "repo" : "mulle-core/mulle-strtod",
+   "repo" : "mulle-core/mulle-dtostr",
    "src" : [
       "src/mulle-dtostr.c",
       "src/mulle-dtostr.h",

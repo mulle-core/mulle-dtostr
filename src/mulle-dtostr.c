@@ -222,7 +222,7 @@ static size_t write_mulle(char* buffer, uint64_t dec_sig, int dec_exp) {
   return( 6);
 }
 
-struct mulle_dtostr_decimal mulle_dtostr_decompose(double value) {
+struct mulle_dtostr_decimal   mulle_dtostr_decompose(double value) {
     struct mulle_dtostr_decimal result = {0};
     
     uint64_t bits = 0;
@@ -309,7 +309,7 @@ struct mulle_dtostr_decimal mulle_dtostr_decompose(double value) {
     return result;
 }
 
-size_t mulle_dtostr(double value, char* buffer) {
+size_t   mulle_dtostr(double value, char* buffer) {
   struct mulle_dtostr_decimal dec;
   char                      *start;
   size_t                    len;
