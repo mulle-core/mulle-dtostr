@@ -4,7 +4,7 @@
 
 A C implementation of the Schubfach algorithm - fast and accurate conversion
 of IEEE-754 `double` values to decimal strings. Basically a fork of
-[vitaut/zimj](https://github.com/vitaut/zmij), ported to C then
+[vitaut/zmij](https://github.com/vitaut/zmij), ported to C then
 recoded for the needs of [mulle-sprintf](//github.com/mulle-core/mulle-sprintf)
 
 
