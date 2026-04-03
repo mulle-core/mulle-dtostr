@@ -6,6 +6,7 @@
    "license" : "UNLICENSED",
    "repo" : "mulle-core/mulle-dtostr",
    "src" : [
+      "asset/dox/TOC.md",
       "src/mulle-dtostr.c",
       "src/mulle-dtostr.h",
       "src/pow10_table_data.inc"
