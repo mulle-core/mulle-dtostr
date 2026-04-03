@@ -36,3 +36,5 @@ test*/**/*.exe
 
 *.test.*
 mulle-dtostr.sublime-workspace
+.roam
+.graveyard
