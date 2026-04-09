@@ -38,3 +38,4 @@ test*/**/*.exe
 mulle-dtostr.sublime-workspace
 .roam
 .graveyard
+*.tmp.*
