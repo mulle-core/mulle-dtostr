@@ -71,8 +71,8 @@ int main() {
     test_roundtrip(-1.7976931348623157e+308, "-DBL_MAX");
     test_roundtrip(1.0/0.0, "+INFINITY");
     test_roundtrip(-1.0/0.0, "-INFINITY");
-    test_roundtrip(0.0/0.0, "NAN");
-    test_roundtrip(-0.0/0.0, "-NAN");
+    test_roundtrip(NAN, "NAN");
+    test_roundtrip(-NAN, "-NAN");
     
     /* Additional specific test values */
     test_roundtrip(8.589973428413488e+09, "8.589973428413488e+09");
