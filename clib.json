@@ -9,7 +9,10 @@
       "asset/dox/api/toc/index.md",
       "src/mulle-dtostr.c",
       "src/mulle-dtostr.h",
-      "src/pow10_table_data.inc"
+      "src/mulle-strtod.c",
+      "src/pow10_table_data.inc",
+      "src/_mulle-dtostr.h",
+      "src/_mulle-strtod.h"
    ],
    "dependencies" : {
       "mulle-c/mulle-c11": "*"

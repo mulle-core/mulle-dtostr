@@ -25,6 +25,8 @@ src/pow10_table_data.inc
 # contents selected with patternfile ??-header--public-headers
 #
 set( PUBLIC_HEADERS
+src/_mulle-dtostr.h
 src/mulle-dtostr.h
+src/_mulle-strtod.h
 )
 
