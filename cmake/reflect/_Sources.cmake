@@ -12,4 +12,5 @@ endif()
 #
 set( SOURCES
 src/mulle-dtostr.c
+src/mulle-strtod.c
 )
