@@ -40,3 +40,6 @@ mulle-dtostr.sublime-workspace
 .graveyard
 *.tmp.*
 .idea
+.kiro/
+TODO.md
+REVIEW.md
