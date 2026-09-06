@@ -1,18 +1,18 @@
 #
-# mulle-dtostr nodetype: ${MULLE__DTOSTR_NODETYPE:-tar}
+# mulle-c11 nodetype: ${MULLE__C11_NODETYPE:-tar}
 #
-export MULLE__DTOSTR_NODETYPE="git"
+export MULLE__C11_NODETYPE="git"
 
 
 #
-# mulle-dtostr url: ${MULLE__DTOSTR_URL:-https://github.com/mulle-kybernetik-tv/mulle-dtostr/archive/${MULLE_TAG}.tar.gz}
+# mulle-c11 url: ${MULLE__C11_URL:-https://github.com/mulle-c/mulle-c11/archive/${MULLE_TAG}.tar.gz}
 #
-export MULLE__DTOSTR_URL="https://github.com/mulle-kybernetik-tv/mulle-dtostr.git"
+export MULLE__C11_URL="https://github.com/mulle-c/mulle-c11.git"
 
 
 #
-# mulle-dtostr branch: ${MULLE__DTOSTR_BRANCH}
+# mulle-c11 branch: ${MULLE__C11_BRANCH}
 #
-export MULLE__DTOSTR_BRANCH="prerelease"
+export MULLE__C11_BRANCH="prerelease"
 
 
