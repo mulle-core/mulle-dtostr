@@ -43,3 +43,10 @@ mulle-dtostr.sublime-workspace
 .kiro/
 TODO.md
 REVIEW.md
+.ackrc
+.vscode/
+.touch
+*.orig
+*.workspace
+*.*-workspace
+*.old
