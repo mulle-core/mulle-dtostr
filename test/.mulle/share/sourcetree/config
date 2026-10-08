@@ -1,1 +1,1 @@
-mulle-dtostr;${MULLE__DTOSTR_NODETYPE:-tar};;72B337B4-AB63-4067-A6D9-5C97AA2012BA;${MULLE__DTOSTR_URL:-https://github.com/MulleWeb/mulle-dtostr/archive/${MULLE_TAG}.tar.gz};${MULLE__DTOSTR_BRANCH};${MULLE__DTOSTR_TAG:-latest};;
+mulle-dtostr;${MULLE__DTOSTR_NODETYPE:-tar};;76F77954-5D13-443D-8F3B-9CBC64037ECE;${MULLE__DTOSTR_URL:-https://github.com/nat/mulle-dtostr/archive/${MULLE_TAG}.tar.gz};${MULLE__DTOSTR_BRANCH};${MULLE__DTOSTR_TAG:-latest};;
