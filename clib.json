@@ -1,9 +1,9 @@
 {
    "name" : "mulle-dtostr",
    "version" : "0.2.1",
-   "description" : "Double to string conversion",
+   "description" : "🧶 Double to string conversion",
    "keywords" : [],
-   "license" : "UNLICENSED",
+   "license" : "MIT",
    "repo" : "mulle-core/mulle-dtostr",
    "src" : [
       "asset/dox/api/toc/index.md",

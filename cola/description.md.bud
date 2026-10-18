@@ -1,0 +1,8 @@
+A C implementation of the Schubfach algorithm - fast and accurate conversion
+of IEEE-754 `double` values to decimal strings. Basically a fork of
+[vitaut/zmij](https://github.com/vitaut/zmij), ported to C then
+recoded for the needs of [mulle-sprintf](//github.com/mulle-core/mulle-sprintf)
+
+
+* It should be faster than anything else
+* It tests for dtostr <-> strtod roundtrip value compatibility
