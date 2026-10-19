@@ -1,6 +1,9 @@
 ### 0.2.1
 
-Various small improvements
+
+
+* ``mulle_dtostr`` now produces correct results on platforms without a native 128-bit integer type (the `umul128` fallback counted the high half of `p0` twice)
+* NaN sign handling in tests is now deterministic across compilers
 
 ## 0.2.0
 
